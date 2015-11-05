@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name          = "crittercism"
-  spec.version       = "0.1.0"
+  spec.version       = "0.1.1"
   spec.authors       = ["Andrew Havens"]
   spec.email         = ["email@andrewhavens.com"]
 
