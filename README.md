@@ -49,18 +49,17 @@ end
 Refer to the [Crittercism docs](http://docs.crittercism.com/ios/ios.html) for
 information on how to use Crittercism's other features.
 
-### Rake Task
+### Uploading dSYM
 
-You will need to upload your app's dSYM to Crittercism for symbolication.
+This gem automatically uploads your dSYM file to Crittercism on every build. To
+disable dSYM upload on simulator builds, add this configuration to your Rakefile:
+
+    app.crittercism_disable_on_simulator_builds = true
+
+If you want to manually upload your app's dSYM to Crittercism for symbolication,
+you can use the following Rake task:
 
     $ rake crittercism:upload_dsym
-
-Typically, you will want to upload your dSYM every time you build your app.
-You can configure your rake tasks to include this task.
-
-```ruby
-task :my_custom_deploy_task => ['archive:distribution', 'crittercism:upload_dsym']
-```
 
 <!--
 ## Development

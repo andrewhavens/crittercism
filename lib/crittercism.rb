@@ -1,18 +1,24 @@
 module Crittercism
-  def self.platform
-    # FIXME: need to be able to fetch this dynamically to support Android and Simulator environments.
-    'iPhoneOS'
+  def self.platform(value = nil)
+    @platform = value if value
+    @platform ||= 'iPhoneOS'
+    @platform
   end
 
   def self.upload_dsym
     app_id = App.config.crittercism_app_id
     api_key = App.config.crittercism_api_key
-    unless app_id and api_key
+
+    unless app_id && api_key
       App.warn 'Missing Crittercism keys, skipping dSYM upload.'
       return
     end
 
-    App.info 'Crittercism', 'Submitting dSYM to Crittercism...'
+    if platform =~ /Simulator/ && App.config.crittercism_disable_on_simulator_builds
+      App.info 'Crittercism', 'Skipping dSYM upload on simulator build.'
+      return
+    end
+
     zip_dsym!
 
     app_dsym = App.config.app_bundle_dsym(platform)
@@ -22,6 +28,7 @@ module Crittercism
                  " -F dsym=@'#{app_dsym}.zip'"\
                  " -F key='#{api_key}'"
 
+    App.info 'Crittercism', 'Uploading dSYM to Crittercism...'
     output = %x[#{command}]
     if output =~ /^2\d+/
       App.info 'Crittercism', 'Successfully uploaded dSYM to Crittercism.'
@@ -39,7 +46,7 @@ module Crittercism
     app_dsym_zip = app_dsym + '.zip'
     if !File.exist?(app_dsym_zip) or File.mtime(app_dsym) > File.mtime(app_dsym_zip)
       Dir.chdir(File.dirname(app_dsym)) do
-        sh "/usr/bin/zip -q -r '#{File.basename(app_dsym)}.zip' '#{File.basename(app_dsym)}'"
+        %x[/usr/bin/zip -q -r '#{File.basename(app_dsym)}.zip' '#{File.basename(app_dsym)}']
       end
     end
   end

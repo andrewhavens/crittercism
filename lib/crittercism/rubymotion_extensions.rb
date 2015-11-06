@@ -1,8 +1,9 @@
 module Crittercism
   module BuilderExtensions
-    def silent_execute_and_capture
-      Crittercism.upload_dsym
+    def build(config, platform, opts)
       super
+      Crittercism.platform(platform)
+      Crittercism.upload_dsym
     end
   end
 end
@@ -18,14 +19,14 @@ end
 module Motion
   module Project
     class Config
-      variable :crittercism_app_id, :crittercism_api_key
+      variable :crittercism_app_id, :crittercism_api_key, :crittercism_disable_on_simulator_builds
     end
   end
 end
 
 Motion::Project::App.setup do |app|
   app.pods do
-    pod 'CrittercismSDK', '5.3.0' # any higher conflicts with New Relic, resulting in duplicate symbol errors
+    pod 'CrittercismSDK', '~> 5.4.0'
   end
 
   # TODO: add runtime support for fetching configured App ID
